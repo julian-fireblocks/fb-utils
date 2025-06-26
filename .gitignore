@@ -3,3 +3,4 @@ fireblocks-secret.key
 *.key
 .env
 output.csv
+.DS_STORE
