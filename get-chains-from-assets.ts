@@ -29,12 +29,14 @@ export async function getChainsAndAssetId(assetList: string[]){
     const assets = {}
     let outputJson: {
         asset: string, 
-        assetId: string, 
+        legacyId: string, 
+        assetId: string,
         blockchainId: string, 
-        blockchainlegacyId: string, 
+        blockchainLegacyId: string, 
         blockchainDisplay: string, 
         deprecated: boolean,
-        nativeAssetId: string
+        nativeAssetId: string,
+        isNativeAsset: boolean
     }[] = []
     for (let i =0; i< assetList.length; i++){
         console.log(`Reading asset ${assetList[i]}`)
@@ -42,6 +44,9 @@ export async function getChainsAndAssetId(assetList: string[]){
         const headers = await getFireblocksAuthorizationHeader({url})
         const assetSearch = await axios.default.get(BASE_URL + url, {headers})
         const result = (await assetSearch.data)?.['data'];
+        result.forEach(asset => {
+            assets[asset.id] = asset
+        })
         console.log(JSON.stringify(result))
         // Get the blockchain for the asset
         for (let j = 0; j < result.length; j++){
@@ -69,12 +74,14 @@ export async function getChainsAndAssetId(assetList: string[]){
             console.log(JSON.stringify(blockchainDetails))
             outputJson.push({
                 asset: assetList[i],
-                assetId: result[j].legacyId,
-                blockchainlegacyId: blockchainDetails.legacyId,
+                legacyId: result[j].legacyId,
+                assetId: result[j].id,
+                blockchainLegacyId: blockchainDetails.legacyId,
                 blockchainId: blockchainDetails.id,
                 blockchainDisplay: blockchainDetails.displayName,
                 deprecated: blockchainDetails.metadata.deprecated,
-                nativeAssetId: asset.displaySymbol
+                nativeAssetId: asset.displaySymbol,
+                isNativeAsset: asset.id == result[j].id
             })
         }
     }
