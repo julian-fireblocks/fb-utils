@@ -1,0 +1,5 @@
+node_modules
+fireblocks-secret.key
+*.key
+.env
+output.csv
