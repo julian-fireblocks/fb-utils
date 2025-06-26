@@ -45,19 +45,21 @@ export async function getChainsAndAssetId(assetList: string[]){
         const assetSearch = await axios.default.get(BASE_URL + url, {headers})
         const result = (await assetSearch.data)?.['data'];
         result.forEach(asset => {
+            if (assets[asset.id]) return;
             assets[asset.id] = asset
         })
         console.log(JSON.stringify(result))
         // Get the blockchain for the asset
         for (let j = 0; j < result.length; j++){
             let blockchainDetails
-            if (blockchains[result[j]]){
-                blockchainDetails = blockchains[result[j]]
+            if (blockchains[result[j].blockchainId]){
+                blockchainDetails = blockchains[result[j].blockchainId]
             } else {
                 const blockchainPath = `/v1/blockchains/${result[j].blockchainId}`
                 const headers = await getFireblocksAuthorizationHeader({url: blockchainPath})
                 const blockchainSearch = await axios.default.get(BASE_URL+ blockchainPath, {headers})
                 blockchainDetails = await blockchainSearch.data
+                blockchains[result[j].blockchainId] = blockchainDetails;
             }
             // check for assetId
             let asset: any = {}
